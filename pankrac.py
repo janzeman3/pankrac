@@ -7,7 +7,39 @@ LINK_NOTION_SPLNENE = "https://www.notion.so/janzeman3/3f6b1919e9bd49eaa46e2e211
 
 ## Odpovídací logika chatbota (verze 1.0 - pěkný fuj)
 class Pankrac:
-        def zpracuj_odezvu(self, message):
+    moznosti = {}
+
+    def __init__(self):
+        self.moznosti = {'keys': ["Pankráci"],
+                    'subnodes': [],
+                    'action': self.nevim}
+
+    def nevim(self, message_text):
+        return "Tady Pankrác, slyším Tě, ale ale nevím, co po mě chceš.\n\n" + self.napoveda()
+
+    def zpracuj_odezvu_new(self, message):
+        otazka = message.content
+
+        mam = False
+        node = self.moznosti
+        while not mam:
+            new_node = node
+
+            for subnode in node['subnodes']:
+                if obsahuje(subnode[keys], otazka):
+                    new_node = subnode
+
+            if new_node == node:
+                mam = True
+            else:
+                node = new_node
+
+        akce = node['action']
+        return akce(otazka)
+
+
+
+    def zpracuj_odezvu(self, message):
                 otazka = message.content
 
                 if "nápověd" in otazka or "pomoc" in otazka:
@@ -23,14 +55,14 @@ class Pankrac:
                 elif obsahuje(["nováč", "novac"], otazka):
                         odpoved = self.web_novacek(otazka)
                 elif obsahuje(["výzv"], otazka):
-                        odpoved = self.web_vyzvy()
+                        odpoved = self.web_vyzvy(otazka)
                 else:
-                        odpoved = "Tady Pankrác, slyším Tě, ale ale nevím, co po mě chceš.\n\n" + self.napoveda()
+                        odpoved = self.zpracuj_odezvu_new(message)
 
                 return odpoved
 
 
-        def napoveda(self):
+    def napoveda(self):
                 return "Nápověda: \n" \
                        "1. Pankrác reaguje, když se objeví ve větě slovo !Pankráci!\n" \
                        "2. Pankrác hledá klíčová !slova! a podle nich dává odpovědi.\n" \
@@ -40,32 +72,32 @@ class Pankrac:
                        ":link: poslat odkaz na stránku !sokol!ů, kde jsou věci, co si máme brát !s sebou! na !schůzk!y.\n"\
                        "na vypsat !nápověd!u, či !pomoc! :wink:"
 
-        def generuj_heslo(self, message_text):
+    def generuj_heslo(self, message_text):
                 from dice_heslo import get_password
                 heslo = get_password()
                 odpoved = "Borče, vygeneroval jsem Ti heslo :muscle: \n" + heslo + "\nmezery do hesla nezadávej :wink:"
                 return odpoved
 
         #webové aktivity
-        def web_akce(self):
+    def web_akce(self):
                 return ":calendar: Nejbližší akce Sokolů najdeš tady: https://ibis.skauting.cz/calendar/skauti/"
 
-        def web_sokoli(self):
+    def web_sokoli(self):
                 return "Třeba Ti pomůže stránka našich skautů: https://ibis.skauting.cz/oddily/skauti-sokoli/"
 
-        def web_stezka(self, message_text):
+    def web_stezka(self, message_text):
                 if obsahuje(["moj", "spln"], message_text):
                     return "Co seznam Tvých splněných bodů stezky?" + LINK_NOTION_SPLNENE
                 else:
                     return "Nepomůže ti stezka? " + LINK_WEB_STEZKA
 
-        def web_novacek(self, message_text):
+    def web_novacek(self, message_text):
             if obsahuje(["splň", "spln", "moje"], message_text):
                 return "Asi by pomohl seznam splněných výzev: " + LINK_NOTION_SPLNENE
             else:
                 return "Snad Ti pomůže nováček: https://stezka.skaut.cz/novacek/"
 
-        def web_vyzvy(self, message_text):
+    def web_vyzvy(self, message_text):
             if "splň" in message_text or "moje" in message_text:
                 return "Asi by pomohl seznam splněných výzev: " + LINK_NOTION_SPLNENE
             else:
