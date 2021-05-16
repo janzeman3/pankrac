@@ -1,3 +1,7 @@
+## diceware generování hesla
+#  5x hodíš kostkou a podle toho, co Ti padne vybereš slovo
+#  tohle uděláš 4x a v 80% mezer dáš čísla do 30
+#  Celkově to je slušně zapamatovatelné heslo, které má sílu asi jako 10 znaků klasického nečitelného hesla
 def get_password():
     dice_words = {}
     with open("diceware_wordlist_cz.txt", encoding="utf-8") as infile:
