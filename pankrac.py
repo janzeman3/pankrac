@@ -1,3 +1,5 @@
+import json
+
 def obsahuje(word_list, expression):
     return any([True for word in word_list if word in expression])
 
@@ -10,67 +12,107 @@ class Pankrac:
     moznosti = {}
 
     def __init__(self):
+        uzel_spln = {'keys': ["spln"],
+                         'subnodes': [],
+                         'action': self.splnena_stezka
+                         }
+
+        uzel_stezka_na_webu = {'keys': ["stezk"],
+                         'subnodes': [uzel_spln],
+                         'action': self.stezka_na_webu
+                         }
+
+        uzel_novacek_na_webu = {'keys': ["nováč"],
+                         'subnodes': [uzel_spln],
+                         'action': self.web_novacek
+                         }
+
+        uzel_vyzvy = {'keys': ["výzv"],
+                         'subnodes': [uzel_spln],
+                         'action': self.web_vyzvy
+                         }
+
+        uzel_generuj_heslo = {'keys': ["heslo"],
+                         'subnodes': [],
+                         'action': self.generuj_heslo
+                         }
+
+        uzel_akce = {'keys': ["akce"],
+                         'subnodes': [],
+                         'action': self.web_akce
+                         }
+
+        uzel_sokoli_web = {'keys': ["s sebou"],
+                         'subnodes': [],
+                         'action': self.web_sokoli
+                         }
+
+
+        uzel_help = {'keys': ["nápověd", "pomoc", "help", "příkazy", "/"],
+                         'subnodes': [],
+                         'action': self.napoveda
+                         }
+
         self.moznosti = {'keys': ["Pankráci"],
-                    'subnodes': [],
-                    'action': self.nevim}
+                         'subnodes': [uzel_sokoli_web, uzel_vyzvy, uzel_stezka_na_webu, uzel_novacek_na_webu, uzel_generuj_heslo, uzel_akce, uzel_help],
+                         'action': self.nevim
+                         }
 
     def nevim(self, message_text):
-        return "Tady Pankrác, slyším Tě, ale ale nevím, co po mě chceš.\n\n" + self.napoveda()
+        return "Tady Pankrác, slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat -Pankráci pomoc!-"
 
-    def zpracuj_odezvu_new(self, message):
+    ## zpracuje odezvu podle obsahu proměnné self.moznosti
+    def zpracuj_odezvu(self, message):
         otazka = message.content
 
-        mam = False
-        node = self.moznosti
-        while not mam:
-            new_node = node
+        # ridici proměnná, která říká, jeslti jsme na konci
+        nejde_jit_dal = False
+        # poslední uzel, kde jsme skončili
+        uzel = self.moznosti
 
-            for subnode in node['subnodes']:
-                if obsahuje(subnode[keys], otazka):
-                    new_node = subnode
+        while not nejde_jit_dal:
+            # do noveho uzlu dam stavajici
+            novy_uzel = uzel
 
-            if new_node == node:
-                mam = True
+            #projdu všechny pod-uzly
+            for poduzel in uzel['subnodes']:
+                if obsahuje(poduzel['keys'], otazka):
+                    # pokud najdu pokračování, dám kandidáta na nový uzel
+                    # !!! v případě shody to vybere poslední shodu
+                    novy_uzel = poduzel
+
+            if novy_uzel == uzel:
+                # pokud jsem se neposunul, nejde jít dál
+                nejde_jit_dal = True
             else:
-                node = new_node
+                # jinak upadutuju uzel a frčím znovu
+                uzel = novy_uzel
 
-        akce = node['action']
+        # nakonec provedu akci z finálního uzlu
+        akce = uzel['action']
         return akce(otazka)
 
+    def generuj_hierarchii(self, uzel, odsazeni):
+        hierarchie = "".ljust(odsazeni*4, " ") + "- "
+        for klicove_slovo in uzel['keys']:
+            hierarchie += klicove_slovo + ' '
+        hierarchie += '\n'
 
+        for poduzel in uzel['subnodes']:
+            hierarchie += self.generuj_hierarchii(poduzel, odsazeni + 1)
 
-    def zpracuj_odezvu(self, message):
-                otazka = message.content
+        return hierarchie
 
-                if "nápověd" in otazka or "pomoc" in otazka:
-                        odpoved = self.napoveda()
-                elif "akce" in otazka:
-                        odpoved = self.web_akce()
-                elif "s sebou" in otazka and "schůzk" in otazka:
-                        odpoved = self.web_sokoli()
-                elif "heslo" in otazka:
-                        odpoved = self.generuj_heslo(otazka)
-                elif obsahuje(["stezk"], otazka):
-                        odpoved = self.web_stezka(otazka)
-                elif obsahuje(["nováč", "novac"], otazka):
-                        odpoved = self.web_novacek(otazka)
-                elif obsahuje(["výzv"], otazka):
-                        odpoved = self.web_vyzvy(otazka)
-                else:
-                        odpoved = self.zpracuj_odezvu_new(message)
+    def napoveda(self, message_text):
+        napoveda_text = "Nápověda: \n" \
+                    "1. Pankrác reaguje, když se objeví ve větě slovo !Pankráci!\n" \
+                    "2. Pankrác hledá klíčová !slova! a podle nich dává odpovědi.\n" \
+                    "3. Hledá je postupně v hierarchii.\n\n" \
 
-                return odpoved
+        hierarchie = "Hierarchie klíčových slov\n"
+        hierarchie += self.generuj_hierarchii(self.moznosti, 1)
 
-
-    def napoveda(self):
-                return "Nápověda: \n" \
-                       "1. Pankrác reaguje, když se objeví ve větě slovo !Pankráci!\n" \
-                       "2. Pankrác hledá klíčová !slova! a podle nich dává odpovědi.\n" \
-                       "\nZatím umí:\n" \
-                       ":muscle:generovat bezpečné !heslo!, co se dobře pamatuje \n" \
-                       ":calendar: poslat odkaz na naše !akce!\n" \
-                       ":link: poslat odkaz na stránku !sokol!ů, kde jsou věci, co si máme brát !s sebou! na !schůzk!y.\n"\
-                       "na vypsat !nápověd!u, či !pomoc! :wink:"
+        return napoveda_text + hierarchie
 
     def generuj_heslo(self, message_text):
                 from dice_heslo import get_password
@@ -79,26 +121,20 @@ class Pankrac:
                 return odpoved
 
         #webové aktivity
-    def web_akce(self):
+    def web_akce(self, message_text):
                 return ":calendar: Nejbližší akce Sokolů najdeš tady: https://ibis.skauting.cz/calendar/skauti/"
 
-    def web_sokoli(self):
+    def web_sokoli(self, message_text):
                 return "Třeba Ti pomůže stránka našich skautů: https://ibis.skauting.cz/oddily/skauti-sokoli/"
 
-    def web_stezka(self, message_text):
-                if obsahuje(["moj", "spln"], message_text):
-                    return "Co seznam Tvých splněných bodů stezky?" + LINK_NOTION_SPLNENE
-                else:
-                    return "Nepomůže ti stezka? " + LINK_WEB_STEZKA
-
     def web_novacek(self, message_text):
-            if obsahuje(["splň", "spln", "moje"], message_text):
-                return "Asi by pomohl seznam splněných výzev: " + LINK_NOTION_SPLNENE
-            else:
-                return "Snad Ti pomůže nováček: https://stezka.skaut.cz/novacek/"
+            return "Snad Ti pomůže nováček: https://stezka.skaut.cz/novacek/"
 
     def web_vyzvy(self, message_text):
-            if "splň" in message_text or "moje" in message_text:
-                return "Asi by pomohl seznam splněných výzev: " + LINK_NOTION_SPLNENE
-            else:
-                return "Tady jsou výzvy: " + LINK_NOTION_VYZVY
+        return "Tady jsou výzvy: " + LINK_NOTION_VYZVY
+
+    def splnena_stezka(self, message_text):
+        return "Asi by pomohl seznam splněných výzev a bodů stezky " + LINK_NOTION_SPLNENE
+
+    def stezka_na_webu(self, message_text):
+        return "Nepomůže ti stezka? " + LINK_WEB_STEZKA
