@@ -14,7 +14,7 @@ class PankracClient(discord.Client):
         print("ID:      " + str(self.user.id))
         print('------')
 
-    ## Zpracování zprávy
+    ## Zpracování zprávy do diskusního kanálu
     async def on_message(self, message):
         # pankrác nereaguje na sebe a reaguje jen, když je osloven
         osloveni = ['<@!843012795440168962>', 'Pankráci', 'pankráci', 'Pankraci', 'pankraci']
@@ -46,7 +46,8 @@ class PankracClient(discord.Client):
             await message.add_reaction(odpoved['data'])
 
 
-    ## Zatím cvičný monitoring reakcí
+    ## Zpracování reakcí
     async def on_reaction_add(self, reaction, user):
+        # pouze monitoring
         print(reaction)
         print(user)
