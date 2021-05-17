@@ -6,32 +6,35 @@ TYPE_TEXT = 1
 TYPE_METHOD = 2
 
 LINK_WEB_STEZKA = "https://stezka.skaut.cz/prohlizej-a-inspiruj-se/"
+LINK_WEB_NOVACEK = "https://stezka.skaut.cz/novacek/"
 LINK_NOTION_VYZVY = "https://www.notion.so/janzeman3/0995fe1d94a9403e99e667fc2ad15e30?v=3d42ab631c064ce0a16dda28bd06439d"
 LINK_NOTION_SPLNENE = "https://www.notion.so/janzeman3/3f6b1919e9bd49eaa46e2e21108ba0ce?v=62bb60897c594cf2ab1d8c30cab459d7"
+LINK_SOKOLI_AKCE = "https://ibis.skauting.cz/calendar/skauti/"
+LINK_SOKOLI_WEB = "https://ibis.skauting.cz/oddily/skauti-sokoli/"
 
-## Odpovídací logika chatbota (verze 1.0 - pěkný fuj)
+## Odpovídací logika chatbota
 class Pankrac:
     moznosti = {}
 
     def __init__(self):
         uzel_spln = {'keys': ["spln"],
                          'subnodes': [],
-                         'action': {'type': TYPE_METHOD, 'data': self.splnena_stezka}
+                         'action': {'type': TYPE_TEXT, 'data': "Asi by pomohl seznam splněných výzev a bodů stezky " + LINK_NOTION_SPLNENE}
                          }
 
         uzel_stezka_na_webu = {'keys': ["stezk"],
                          'subnodes': [uzel_spln],
-                         'action': {'type': TYPE_METHOD, 'data':  self.stezka_na_webu}
+                         'action': {'type': TYPE_TEXT, 'data':  "Posílám odkaz na stezku " + LINK_WEB_STEZKA}
                          }
 
         uzel_novacek_na_webu = {'keys': ["nováč"],
                          'subnodes': [uzel_spln],
-                         'action': {'type': TYPE_METHOD, 'data':  self.web_novacek}
+                         'action': {'type': TYPE_TEXT, 'data':  "Snad Ti pomůže nováček " + LINK_WEB_NOVACEK}
                          }
 
         uzel_vyzvy = {'keys': ["výzv"],
                          'subnodes': [uzel_spln],
-                         'action': {'type': TYPE_METHOD, 'data':  self.web_vyzvy}
+                         'action': {'type': TYPE_TEXT, 'data':  "Tady jsou výzvy " + LINK_NOTION_VYZVY}
                          }
 
         uzel_generuj_heslo = {'keys': ["heslo"],
@@ -41,12 +44,12 @@ class Pankrac:
 
         uzel_akce = {'keys': ["akce"],
                          'subnodes': [],
-                         'action': {'type': TYPE_METHOD, 'data':  self.web_akce}
+                         'action': {'type': TYPE_TEXT, 'data':  ":calendar: Nejbližší akce Sokolů najdeš tady: " + LINK_SOKOLI_AKCE}
                          }
 
         uzel_sokoli_web = {'keys': ["s sebou"],
                          'subnodes': [],
-                         'action': {'type': TYPE_METHOD, 'data':  self.web_sokoli}
+                         'action': {'type': TYPE_TEXT, 'data':  "Třeba Ti pomůže stránka našich skautů: " + LINK_SOKOLI_WEB}
                          }
 
 
@@ -128,24 +131,5 @@ class Pankrac:
     def generuj_heslo(self, message_text):
                 from dice_heslo import get_password
                 heslo = get_password()
-                odpoved = "Borče, vygeneroval jsem Ti heslo :muscle: \n" + heslo + "\nmezery do hesla nezadávej :wink:"
+                odpoved = "vygeneroval jsem Ti heslo :muscle: \n" + heslo + "\nmezery do hesla nezadávej :wink:"
                 return odpoved
-
-        #webové aktivity
-    def web_akce(self, message_text):
-                return ":calendar: Nejbližší akce Sokolů najdeš tady: https://ibis.skauting.cz/calendar/skauti/"
-
-    def web_sokoli(self, message_text):
-                return "Třeba Ti pomůže stránka našich skautů: https://ibis.skauting.cz/oddily/skauti-sokoli/"
-
-    def web_novacek(self, message_text):
-            return "Snad Ti pomůže nováček: https://stezka.skaut.cz/novacek/"
-
-    def web_vyzvy(self, message_text):
-        return "Tady jsou výzvy: " + LINK_NOTION_VYZVY
-
-    def splnena_stezka(self, message_text):
-        return "Asi by pomohl seznam splněných výzev a bodů stezky " + LINK_NOTION_SPLNENE
-
-    def stezka_na_webu(self, message_text):
-        return "Nepomůže ti stezka? " + LINK_WEB_STEZKA
