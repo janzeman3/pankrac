@@ -1,7 +1,6 @@
 import json
 
-def obsahuje(word_list, expression):
-    return any([True for word in word_list if word in expression])
+from pankracutils import obsahuje
 
 LINK_WEB_STEZKA = "https://stezka.skaut.cz/prohlizej-a-inspiruj-se/"
 LINK_NOTION_VYZVY = "https://www.notion.so/janzeman3/0995fe1d94a9403e99e667fc2ad15e30?v=3d42ab631c064ce0a16dda28bd06439d"

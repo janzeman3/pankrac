@@ -1,17 +1,13 @@
 import discord
-import datetime
 from pankrac import Pankrac
-
+from pankracutils import now
 
 ## Třída, která řeší spojení s discordem a výpisy do konzole na straně serveru
 #  Jedná se o potomka discord.Client, takže overridujme události a posíláme je do Pankráce
 class PankracClient(discord.Client):
-    def now(self):
-        return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
     ## Když Pankrác nastaruje a připojí se k discordu
     async def on_ready(self):
-        print(self.now())
+        print(now())
         print('Startuji Pankráce...')
         print("Username:" + self.user.name)
         print("ID:      " + str(self.user.id))
@@ -35,7 +31,7 @@ class PankracClient(discord.Client):
             print("Končím...")
             return
 
-        print(self.now() + '\nPankrác osloven')
+        print(now() + '\nPankrác osloven')
         print("{0} (ID {1}): {2}".format(message.author.name, message.author.id, message.content))
 
         nasPankrac = Pankrac()
