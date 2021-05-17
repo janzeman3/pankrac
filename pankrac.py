@@ -79,7 +79,7 @@ class Pankrac:
         return odpoved
 
     ## zpracuje odezvu podle obsahu proměnné self.moznosti
-    def zpracuj_odezvu(self, message):
+    def zpracuj_zpravu(self, message):
         otazka = message.content
 
         # ridici proměnná, která říká, jeslti jsme na konci

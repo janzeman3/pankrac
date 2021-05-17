@@ -35,7 +35,7 @@ class PankracClient(discord.Client):
         print("{0} (ID {1}): {2}".format(message.author.name, message.author.id, message.content))
 
         nasPankrac = Pankrac()
-        odpoved = nasPankrac.zpracuj_odezvu(message)
+        nasPankrac.zpracuj_zpravu(message)
 
         if odpoved:
             print("Pankrác odpoví: " + odpoved + "\n------\n")
