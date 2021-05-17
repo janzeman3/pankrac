@@ -16,7 +16,7 @@ class PankracClient(discord.Client):
     ## Zpracování zprávy
     async def on_message(self, message):
         # pankrác nereaguje na sebe a reaguje jen, když je osloven
-        osloveni = ['Pankráci', 'pankráci', 'Pankraci', 'pankraci']
+        osloveni = ['<@!843012795440168962>', 'Pankráci', 'pankráci', 'Pankraci', 'pankraci']
         if (message.author.id == self.user.id) or not any([True for x in osloveni if x in message.content]):
             return
 
@@ -36,9 +36,10 @@ class PankracClient(discord.Client):
 
         nasPankrac = Pankrac()
         odpoved = nasPankrac.zpracuj_odezvu(message)
-        print("Pankrác odpoví: " + odpoved + "\n------\n")
 
-        await message.channel.send("<@" + str(message.author.id) + ">, " + odpoved)
+        if odpoved:
+            print("Pankrác odpoví: " + odpoved + "\n------\n")
+            await message.channel.send("<@" + str(message.author.id) + ">, " + odpoved)
 
 
     ## Zatím cvičný monitoring reakcí

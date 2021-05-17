@@ -58,13 +58,15 @@ class Pankrac:
                          'action': {'type': TYPE_METHOD, 'data':  self.napoveda}
                          }
 
-        self.moznosti = {'keys': ["Pankráci"],
-                         'subnodes': [uzel_sokoli_web, uzel_vyzvy, uzel_stezka_na_webu, uzel_novacek_na_webu, uzel_generuj_heslo, uzel_akce, uzel_help],
-                         'action': {'type': TYPE_METHOD, 'data':  self.nevim}
+        uzel_dik = {'keys': ["dík", "dik", "dekuj", "děkuj"],
+                         'subnodes': [],
+                         'action': {'type': TYPE_METHOD, 'data':  self.nic}
                          }
 
-    def nevim(self, message_text):
-        return "Tady Pankrác, slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat -Pankráci pomoc!-"
+        self.moznosti = {'keys': ["Pankráci"],
+                         'subnodes': [uzel_dik, uzel_sokoli_web, uzel_vyzvy, uzel_stezka_na_webu, uzel_novacek_na_webu, uzel_generuj_heslo, uzel_akce, uzel_help],
+                         'action': {'type': TYPE_METHOD, 'data':  self.nevim}
+                         }
 
     ## obdrží akci a vygeneruje její výsledek na základě dané otázky
     def vysledek_akce(self, akce, otazka):
@@ -116,6 +118,12 @@ class Pankrac:
             hierarchie += self.generuj_hierarchii(poduzel, odsazeni + 1)
 
         return hierarchie
+
+    def nic(self, message_text):
+        return ""
+
+    def nevim(self, message_text):
+        return "Tady Pankrác, slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat -Pankráci pomoc!-"
 
     def napoveda(self, message_text):
         napoveda_text = "Nápověda: \n" \
