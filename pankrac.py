@@ -2,8 +2,12 @@ import json
 
 from pankracutils import obsahuje
 
-TYPE_TEXT = 1
-TYPE_METHOD = 2
+TYPE_RUTINNE_TEXT = 1
+TYPE_RUTINNE_METHOD = 2
+
+TYPE_RESPONSE_MESSAGE = 1
+TYPE_RESPONSE_ANSWER = 2
+TYPE_RESPONSE_REACTION = 3
 
 LINK_WEB_STEZKA = "https://stezka.skaut.cz/prohlizej-a-inspiruj-se/"
 LINK_WEB_NOVACEK = "https://stezka.skaut.cz/novacek/"
@@ -19,63 +23,68 @@ class Pankrac:
     def __init__(self):
         uzel_spln = {'keys': ["spln"],
                          'subnodes': [],
-                         'action': {'type': TYPE_TEXT, 'data': "Asi by pomohl seznam splněných výzev a bodů stezky " + LINK_NOTION_SPLNENE}
+                         'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Asi by pomohl seznam splněných výzev a bodů stezky " + LINK_NOTION_SPLNENE}
                          }
 
         uzel_stezka_na_webu = {'keys': ["stezk"],
                          'subnodes': [uzel_spln],
-                         'action': {'type': TYPE_TEXT, 'data':  "Posílám odkaz na stezku " + LINK_WEB_STEZKA}
+                         'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Posílám odkaz na stezku " + LINK_WEB_STEZKA}
                          }
 
         uzel_novacek_na_webu = {'keys': ["nováč"],
                          'subnodes': [uzel_spln],
-                         'action': {'type': TYPE_TEXT, 'data':  "Snad Ti pomůže nováček " + LINK_WEB_NOVACEK}
+                         'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Snad Ti pomůže nováček " + LINK_WEB_NOVACEK}
                          }
 
         uzel_vyzvy = {'keys': ["výzv"],
                          'subnodes': [uzel_spln],
-                         'action': {'type': TYPE_TEXT, 'data':  "Tady jsou výzvy " + LINK_NOTION_VYZVY}
+                         'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Tady jsou výzvy " + LINK_NOTION_VYZVY}
                          }
 
         uzel_generuj_heslo = {'keys': ["heslo"],
                          'subnodes': [],
-                         'action': {'type': TYPE_METHOD, 'data':  self.generuj_heslo}
+                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.generuj_heslo}
                          }
 
         uzel_akce = {'keys': ["akce"],
                          'subnodes': [],
-                         'action': {'type': TYPE_TEXT, 'data':  ":calendar: Nejbližší akce Sokolů najdeš tady: " + LINK_SOKOLI_AKCE}
+                         'action': {'type': TYPE_RUTINNE_TEXT, 'data': ":calendar: Nejbližší akce Sokolů najdeš tady: " + LINK_SOKOLI_AKCE}
                          }
 
         uzel_sokoli_web = {'keys': ["s sebou"],
                          'subnodes': [],
-                         'action': {'type': TYPE_TEXT, 'data':  "Třeba Ti pomůže stránka našich skautů: " + LINK_SOKOLI_WEB}
+                         'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Třeba Ti pomůže stránka našich skautů: " + LINK_SOKOLI_WEB}
                          }
 
 
         uzel_help = {'keys': ["nápověd", "pomoc", "help", "příkazy", "/"],
                          'subnodes': [],
-                         'action': {'type': TYPE_METHOD, 'data':  self.napoveda}
+                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.napoveda}
                          }
 
         uzel_dik = {'keys': ["dík", "dik", "dekuj", "děkuj"],
                          'subnodes': [],
-                         'action': {'type': TYPE_METHOD, 'data':  self.nic}
+                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.nic}
                          }
 
         self.moznosti = {'keys': ["Pankráci"],
                          'subnodes': [uzel_dik, uzel_sokoli_web, uzel_vyzvy, uzel_stezka_na_webu, uzel_novacek_na_webu, uzel_generuj_heslo, uzel_akce, uzel_help],
-                         'action': {'type': TYPE_METHOD, 'data':  self.nevim}
+                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.nevim}
                          }
 
     ## obdrží akci a vygeneruje její výsledek na základě dané otázky
     def vysledek_akce(self, akce, otazka):
-        if akce['type'] == TYPE_METHOD:
-            odpoved = akce['data'](otazka)
-        elif akce['type'] == TYPE_TEXT:
-            odpoved = akce['data']
+        odpoved = {}
+        odpoved['type'] = TYPE_RESPONSE_MESSAGE
+        odpoved['data'] = ""
+
+        if akce['type'] == TYPE_RUTINNE_METHOD:
+            odpoved['data'], odpoved['type'] = akce['data'](otazka)
+        elif akce['type'] == TYPE_RUTINNE_TEXT:
+            odpoved['data'] = akce['data']
         else:
-            odpoved = "Chyba dat kontaktuj programátory..."
+            odpoved['data'] = "Chyba dat kontaktuj programátory..."
+
         return odpoved
 
     ## zpracuje odezvu podle obsahu proměnné self.moznosti
@@ -120,10 +129,10 @@ class Pankrac:
         return hierarchie
 
     def nic(self, message_text):
-        return ""
+        return "👍", TYPE_RESPONSE_REACTION
 
     def nevim(self, message_text):
-        return "Tady Pankrác, slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat -Pankráci pomoc!-"
+        return "Tady Pankrác, slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat -Pankráci pomoc!-", TYPE_RESPONSE_MESSAGE
 
     def napoveda(self, message_text):
         napoveda_text = "Nápověda: \n" \
@@ -134,10 +143,10 @@ class Pankrac:
         hierarchie = "Hierarchie klíčových slov\n"
         hierarchie += self.generuj_hierarchii(self.moznosti, 1)
 
-        return napoveda_text + hierarchie
+        return napoveda_text + hierarchie, TYPE_RESPONSE_MESSAGE
 
     def generuj_heslo(self, message_text):
-                from dice_heslo import get_password
-                heslo = get_password()
-                odpoved = "vygeneroval jsem Ti heslo :muscle: \n" + heslo + "\nmezery do hesla nezadávej :wink:"
-                return odpoved
+        from dice_heslo import get_password
+        heslo = get_password()
+        odpoved = "vygeneroval jsem Ti heslo :muscle: \n" + heslo + "\nmezery do hesla nezadávej :wink:"
+        return odpoved, TYPE_RESPONSE_MESSAGE

@@ -1,4 +1,5 @@
 import discord
+import pankrac
 from pankrac import Pankrac
 from pankracutils import now
 
@@ -35,11 +36,14 @@ class PankracClient(discord.Client):
         print("{0} (ID {1}): {2}".format(message.author.name, message.author.id, message.content))
 
         nasPankrac = Pankrac()
-        nasPankrac.zpracuj_zpravu(message)
+        odpoved = nasPankrac.zpracuj_zpravu(message)
 
-        if odpoved:
-            print("Pankrác odpoví: " + odpoved + "\n------\n")
-            await message.channel.send("<@" + str(message.author.id) + ">, " + odpoved)
+        if odpoved['type'] == pankrac.TYPE_RESPONSE_MESSAGE:
+            print("Pankrác odpoví: " + odpoved['data'] + "\n------\n")
+            await message.channel.send("<@" + str(message.author.id) + ">, " + odpoved['data'])
+        elif odpoved['type'] == pankrac.TYPE_RESPONSE_REACTION:
+            print("Pankrác dal reakci: " + odpoved['data'] + "\n------\n")
+            await message.add_reaction(odpoved['data'])
 
 
     ## Zatím cvičný monitoring reakcí
