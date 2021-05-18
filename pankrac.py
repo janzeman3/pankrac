@@ -5,6 +5,7 @@ from pankracutils import obsahuje
 TYPE_RUTINNE_TEXT = 1
 TYPE_RUTINNE_METHOD = 2
 
+TYPE_RESPONSE_NOTHING = 0
 TYPE_RESPONSE_MESSAGE = 1
 TYPE_RESPONSE_ANSWER = 2
 TYPE_RESPONSE_REACTION = 3
@@ -56,7 +57,6 @@ class Pankrac:
                          'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Třeba Ti pomůže stránka našich skautů: " + LINK_SOKOLI_WEB}
                          }
 
-
         uzel_help = {'keys': ["nápověd", "pomoc", "help", "příkazy", "/"],
                          'subnodes': [],
                          'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.napoveda}
@@ -64,11 +64,17 @@ class Pankrac:
 
         uzel_dik = {'keys': ["dík", "dik", "dekuj", "děkuj"],
                          'subnodes': [],
-                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.nic}
+                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.reaction_thumbs_up}
+                         }
+
+        uzel_ahoj = {'keys': ["ahoj", "nazdar", "dobrou noc", "dobry den"],
+                         'subnodes': [],
+                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.reaction_wave}
                          }
 
         self.moznosti = {'keys': ["Pankráci"],
-                         'subnodes': [uzel_dik, uzel_sokoli_web, uzel_vyzvy, uzel_stezka_na_webu, uzel_novacek_na_webu, uzel_generuj_heslo, uzel_akce, uzel_help],
+                         'subnodes': [uzel_dik, uzel_ahoj, uzel_sokoli_web, uzel_vyzvy, uzel_stezka_na_webu,
+                                      uzel_novacek_na_webu, uzel_generuj_heslo, uzel_akce, uzel_help],
                          'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.nevim}
                          }
 
@@ -117,6 +123,9 @@ class Pankrac:
         # nakonec provedu akci z finálního uzlu
         return self.vysledek_akce(uzel['action'], otazka)
 
+    def zpracuj_reakci(self, reakce):
+        return {'type': TYPE_RESPONSE_NOTHING}
+
     def generuj_hierarchii(self, uzel, odsazeni):
         hierarchie = "".ljust(odsazeni*4, " ") + "- "
         for klicove_slovo in uzel['keys']:
@@ -128,11 +137,14 @@ class Pankrac:
 
         return hierarchie
 
-    def nic(self, message_text):
+    def reaction_thumbs_up(self, message_text):
         return "👍", TYPE_RESPONSE_REACTION
 
+    def reaction_wave(self, message_text):
+        return "👋", TYPE_RESPONSE_REACTION
+
     def nevim(self, message_text):
-        return "Tady Pankrác, slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat -Pankráci pomoc!-", TYPE_RESPONSE_MESSAGE
+        return 'slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat "Pankráci pomoc!"', TYPE_RESPONSE_MESSAGE
 
     def napoveda(self, message_text):
         napoveda_text = "Nápověda: \n" \
