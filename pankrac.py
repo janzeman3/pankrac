@@ -9,6 +9,7 @@ TYPE_RESPONSE_NOTHING = 0
 TYPE_RESPONSE_MESSAGE = 1
 TYPE_RESPONSE_ANSWER = 2
 TYPE_RESPONSE_REACTION = 3
+TYPE_RESPONSE_KVIZ = 4
 
 LINK_WEB_STEZKA = "https://stezka.skaut.cz/prohlizej-a-inspiruj-se/"
 LINK_WEB_NOVACEK = "https://stezka.skaut.cz/novacek/"
@@ -19,7 +20,12 @@ LINK_SOKOLI_WEB = "https://ibis.skauting.cz/oddily/skauti-sokoli/"
 
 ## Odpovídací logika chatbota
 class Pankrac:
+    ## hlavní rozhodovací struktura
     moznosti = {}
+
+    ## data kvízů
+    running_kviz = False
+    data_kviz = {}
 
     def __init__(self):
         uzel_spln = {'keys': ["spln"],
@@ -72,8 +78,17 @@ class Pankrac:
                          'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.reaction_wave}
                          }
 
+        uzel_kviz_konec = {'keys': ["konec", "off", "vypni"],
+                         'subnodes': [],
+                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.kviz_konec}
+                         }
+        uzel_kviz = {'keys': ["kviz", "kvíz"],
+                         'subnodes': [uzel_kviz_konec],
+                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.kviz}
+                         }
+
         self.moznosti = {'keys': ["Pankráci"],
-                         'subnodes': [uzel_dik, uzel_ahoj, uzel_sokoli_web, uzel_vyzvy, uzel_stezka_na_webu,
+                         'subnodes': [uzel_dik, uzel_ahoj, uzel_kviz, uzel_sokoli_web, uzel_vyzvy, uzel_stezka_na_webu,
                                       uzel_novacek_na_webu, uzel_generuj_heslo, uzel_akce, uzel_help],
                          'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.nevim}
                          }
@@ -162,3 +177,28 @@ class Pankrac:
         heslo = get_password()
         odpoved = "vygeneroval jsem Ti heslo :muscle: \n" + heslo + "\nmezery do hesla nezadávej :wink:"
         return odpoved, TYPE_RESPONSE_MESSAGE
+
+    def kviz(self, message_text):
+        if not self.running_kviz:
+            self.running_kviz = True
+            otazka1 = ":question: Jak se jmenuje nejlepší skaut na světě?\n" \
+                      ":one: Honza\n" \
+                      ":two: Hejkal\n" \
+                      ":three: Blanka"
+            otazka2 = ":question: Kolik nohou má pavouk\n" \
+                      ":one: 6\n" \
+                      ":two: 8\n" \
+                    ":three: podle toho kolik mu jich necháš"
+            return [otazka1, otazka2], TYPE_RESPONSE_KVIZ
+        else:
+            return "Kvíz už běží, nejdřív ukonči předchozí", TYPE_RESPONSE_MESSAGE
+
+
+    def kviz_konec(self, message_text):
+        if not self.running_kviz:
+            return "Není, co končit, žádný kvíz neběžel.", TYPE_RESPONSE_MESSAGE
+
+        self.running_kviz = False
+        vyhodnoceni = "Vyhrál ten nejlepší"
+        return "Kvíz ukončen!\n" + vyhodnoceni, TYPE_RESPONSE_MESSAGE
+

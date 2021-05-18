@@ -26,6 +26,14 @@ class PankracClient(discord.Client):
         elif odpoved['type'] == pankrac.TYPE_RESPONSE_REACTION:
             print("Pankrác dal reakci: " + odpoved['data'] + "\n------\n")
             await message.add_reaction(odpoved['data'])
+        elif odpoved['type'] == pankrac.TYPE_RESPONSE_KVIZ:
+            for otazka_text in odpoved['data']:
+                print("Pankrác dal reakci: " + otazka_text)
+                otazka_message = await message.channel.send(otazka_text)
+                await otazka_message.add_reaction("1️⃣")
+                await otazka_message.add_reaction("2️⃣")
+                await otazka_message.add_reaction("3️⃣")
+            print("\n------\n")
 
     ## Zpracování zprávy do diskusního kanálu
     async def on_message(self, message):
