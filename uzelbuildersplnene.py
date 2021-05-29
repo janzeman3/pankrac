@@ -11,7 +11,7 @@ def get_node_splnene():
     tabulka_odpovedi = {PREFIX: "asi by pomohl seznam splněných výzev a bodů stezky... ",
                         SUFFIX: "",
                         NOT_FOUND: LINK_NOTION_SPLNENE_VSICHNI,
-                        'janzeman3': "ty nic neplniš, tak Ti dám odkaz na všechny kluky " + LINK_NOTION_SPLNENE_DB,
+                        'janzeman3': "ty nic neplníš, tak Ti dám odkaz na všechny kluky " + LINK_NOTION_SPLNENE_DB,
                         'TOXIC_vetracek': LINK_NOTION_SPLNENE_RON,
                         'Pooky': LINK_NOTION_SPLNENE_VOJTA,
                         'RoVeR': LINK_NOTION_SPLNENE_HARRY}
