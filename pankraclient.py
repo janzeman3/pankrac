@@ -26,6 +26,12 @@ class PankracClient(discord.Client):
         elif odpoved['type'] == pankrac.TYPE_RESPONSE_REACTION:
             print("Pankrác dal reakci: " + odpoved['data'] + "\n------\n")
             await message.add_reaction(odpoved['data'])
+        elif odpoved['type'] == pankrac.TYPE_RESPONSE_CLOSE:
+            if (message.author.name == "janzeman3"):
+                await message.add_reaction(pankrac.REACTION_CRY)
+                await message.channel.send("Kluci, loučím se, pro dnešek musím :wave:")
+                await self.close()
+                print("Končím...")
 
     ## Zpracování zprávy do diskusního kanálu
     async def on_message(self, message):
@@ -36,14 +42,6 @@ class PankracClient(discord.Client):
 
         # pokud Pankrác pozná, že je to pro něj, tak dá očko
         await message.add_reaction("👀")
-
-        # vypnutí Pankráce, když mu jeho autor napíše, že má jít spát
-        if (message.author.name == "janzeman3") and message.content == "Pankráci, spát!":
-            await message.add_reaction(pankrac.REACTION_CRY)
-            await message.channel.send("Kluci, loučím se, pro dnešek musím :wave:")
-            await self.close()
-            print("Končím...")
-            return
 
         print(now() + '\nPankrác osloven')
         print("{0} (ID {1}): {2}".format(message.author.name, message.author.id, message.content))

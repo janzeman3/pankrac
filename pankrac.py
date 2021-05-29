@@ -2,9 +2,11 @@ import json
 
 from pankracutils import obsahuje
 
+TYPE_RUTINNE_CLOSE = -1
 TYPE_RUTINNE_TEXT = 1
 TYPE_RUTINNE_METHOD = 2
 
+TYPE_RESPONSE_CLOSE = -1
 TYPE_RESPONSE_NOTHING = 0
 TYPE_RESPONSE_MESSAGE = 1
 TYPE_RESPONSE_ANSWER = 2
@@ -76,8 +78,13 @@ class Pankrac:
                          'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.reaction_wave}
                          }
 
+        uzel_close = {'keys': ["spát!"],
+                         'subnodes': [],
+                         'action': {'type': TYPE_RUTINNE_CLOSE, 'data': ""}
+                         }
+
         self.moznosti = {'keys': ["Pankráci"],
-                         'subnodes': [uzel_dik, uzel_ahoj, uzel_sokoli_web, uzel_vyzvy, uzel_stezka_na_webu,
+                         'subnodes': [uzel_close, uzel_dik, uzel_ahoj, uzel_sokoli_web, uzel_vyzvy, uzel_stezka_na_webu,
                                       uzel_novacek_na_webu, uzel_generuj_heslo, uzel_akce, uzel_help],
                          'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.nevim}
                          }
@@ -92,6 +99,8 @@ class Pankrac:
             odpoved['data'], odpoved['type'] = akce['data'](otazka)
         elif akce['type'] == TYPE_RUTINNE_TEXT:
             odpoved['data'] = akce['data']
+        elif akce['type'] == TYPE_RUTINNE_CLOSE:
+            odpoved['type'] = TYPE_RESPONSE_CLOSE
         else:
             odpoved['data'] = "Chyba dat kontaktuj programátory..."
 
