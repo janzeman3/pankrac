@@ -1,11 +1,12 @@
 from pankracutils import obsahuje
-from konstanty import TYPE_RUTINNE_CLOSE, TYPE_RUTINNE_METHOD, TYPE_RUTINNE_TEXT
+from konstanty import TYPE_RUTINNE_CLOSE, TYPE_RUTINNE_METHOD, TYPE_RUTINNE_TEXT, TYPE_RUTINNE_TEXT_BY_USER
 
 TYPE_RESPONSE_CLOSE = -1
 TYPE_RESPONSE_NOTHING = 0
 TYPE_RESPONSE_MESSAGE = 1
 TYPE_RESPONSE_ANSWER = 2
 TYPE_RESPONSE_REACTION = 3
+TYPE_RESPONSE_MESSAGE_RESPONDENT_BASED = 4
 
 LINK_WEB_STEZKA = "https://stezka.skaut.cz/prohlizej-a-inspiruj-se/"
 LINK_WEB_NOVACEK = "https://stezka.skaut.cz/novacek/"
@@ -27,17 +28,17 @@ class Pankrac:
         uzel_spln = nbsplnene.get_node_splnene()
 
         uzel_stezka_na_webu = {'keys': ["stezk"],
-                         'subnodes': [uzel_spln],
+                         'subnodes': [],
                          'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Posílám odkaz na stezku " + LINK_WEB_STEZKA}
                          }
 
         uzel_novacek_na_webu = {'keys': ["nováč"],
-                         'subnodes': [uzel_spln],
+                         'subnodes': [],
                          'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Snad Ti pomůže nováček " + LINK_WEB_NOVACEK}
                          }
 
         uzel_vyzvy = {'keys': ["výzv"],
-                         'subnodes': [uzel_spln],
+                         'subnodes': [],
                          'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Tady jsou výzvy " + LINK_NOTION_VYZVY}
                          }
 
@@ -78,22 +79,50 @@ class Pankrac:
 
         self.moznosti = {'keys': ["Pankráci"],
                          'subnodes': [uzel_close, uzel_dik, uzel_ahoj, uzel_sokoli_web, uzel_vyzvy, uzel_stezka_na_webu,
-                                      uzel_novacek_na_webu, uzel_generuj_heslo, uzel_akce, uzel_help],
+                                      uzel_novacek_na_webu, uzel_generuj_heslo, uzel_akce, uzel_help, uzel_spln],
                          'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.nevim}
                          }
 
+    ## TODO
+    def reakce_dle_tabulky(self, uzivatel, tabulka_odpovedi):
+        odpoved = ""
+
+        klice = tabulka_odpovedi.keys()
+
+        from konstanty import PREFIX, SUFFIX, NOT_FOUND
+
+        if PREFIX in klice:
+            odpoved += tabulka_odpovedi[PREFIX]
+
+        if uzivatel in klice:
+            odpoved += tabulka_odpovedi[uzivatel]
+        else:
+            odpoved += tabulka_odpovedi[NOT_FOUND]
+
+        if SUFFIX in klice:
+            odpoved += tabulka_odpovedi[SUFFIX]
+
+        return odpoved
+
     ## obdrží akci a vygeneruje její výsledek na základě dané otázky
-    def vysledek_akce(self, akce, otazka):
+    def vysledek_akce(self, akce, message):
+        otazka = message.content
         odpoved = {}
         odpoved['type'] = TYPE_RESPONSE_MESSAGE
         odpoved['data'] = ""
 
         if akce['type'] == TYPE_RUTINNE_METHOD:
             odpoved['data'], odpoved['type'] = akce['data'](otazka)
+
         elif akce['type'] == TYPE_RUTINNE_TEXT:
             odpoved['data'] = akce['data']
+
+        elif akce['type'] == TYPE_RUTINNE_TEXT_BY_USER:
+            odpoved['data'] = self.reakce_dle_tabulky(message.author.name, akce['data'])
+
         elif akce['type'] == TYPE_RUTINNE_CLOSE:
             odpoved['type'] = TYPE_RESPONSE_CLOSE
+
         else:
             odpoved['data'] = "Chyba dat kontaktuj programátory..."
 
@@ -127,7 +156,7 @@ class Pankrac:
                 uzel = novy_uzel
 
         # nakonec provedu akci z finálního uzlu
-        return self.vysledek_akce(uzel['action'], otazka)
+        return self.vysledek_akce(uzel['action'], message)
 
     def zpracuj_reakci(self, reakce):
         return {'type': TYPE_RESPONSE_NOTHING}
