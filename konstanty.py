@@ -2,12 +2,13 @@ PREFIX = 'prefix'
 SUFFIX = 'suffix'
 NOT_FOUND = 'nenalezeno'
 
-TYPE_RUTINNE_CLOSE = -1
-TYPE_RUTINNE_TEXT = 1
-TYPE_RUTINNE_METHOD = 2
-TYPE_RUTINNE_TEXT_BY_USER = 3
-
 from enum import Enum
+
+class Odezva(Enum):
+    CLOSE = -1
+    TEXT = 1
+    METHOD = 2
+    TEXT_BY_USER = 3
 
 class ResponseType(Enum):
     CLOSE = -1
@@ -16,7 +17,7 @@ class ResponseType(Enum):
     ANSWER = 2
     REACTION = 3
 
-class Reaction(Enum):
+class Reaction:
     WAVE = "👋"
     THUMB_UP = "👍"
     CRY = "😭"

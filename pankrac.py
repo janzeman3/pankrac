@@ -1,6 +1,5 @@
 from pankracutils import obsahuje
-from konstanty import TYPE_RUTINNE_CLOSE, TYPE_RUTINNE_METHOD, TYPE_RUTINNE_TEXT, TYPE_RUTINNE_TEXT_BY_USER
-from konstanty import ResponseType, Reaction
+from konstanty import ResponseType, Reaction, Odezva
 
 LINK_WEB_STEZKA = "https://stezka.skaut.cz/prohlizej-a-inspiruj-se/"
 LINK_WEB_NOVACEK = "https://stezka.skaut.cz/novacek/"
@@ -18,58 +17,58 @@ class Pankrac:
 
         uzel_stezka_na_webu = {'keys': ["stezk"],
                          'subnodes': [],
-                         'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Posílám odkaz na stezku " + LINK_WEB_STEZKA}
+                         'action': {'type': Odezva.TEXT, 'data': "Posílám odkaz na stezku " + LINK_WEB_STEZKA}
                          }
 
         uzel_novacek_na_webu = {'keys': ["nováč"],
                          'subnodes': [],
-                         'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Snad Ti pomůže nováček " + LINK_WEB_NOVACEK}
+                         'action': {'type': Odezva.TEXT, 'data': "Snad Ti pomůže nováček " + LINK_WEB_NOVACEK}
                          }
 
         uzel_vyzvy = {'keys': ["výzv"],
                          'subnodes': [],
-                         'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Tady jsou výzvy " + LINK_NOTION_VYZVY}
+                         'action': {'type': Odezva.TEXT, 'data': "Tady jsou výzvy " + LINK_NOTION_VYZVY}
                          }
 
         uzel_generuj_heslo = {'keys': ["heslo"],
                          'subnodes': [],
-                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.generuj_heslo}
+                         'action': {'type': Odezva.METHOD, 'data':  self.generuj_heslo}
                          }
 
         uzel_akce = {'keys': ["akce"],
                          'subnodes': [],
-                         'action': {'type': TYPE_RUTINNE_TEXT, 'data': ":calendar: Nejbližší akce Sokolů najdeš tady: " + LINK_SOKOLI_AKCE}
+                         'action': {'type': Odezva.TEXT, 'data': ":calendar: Nejbližší akce Sokolů najdeš tady: " + LINK_SOKOLI_AKCE}
                          }
 
         uzel_sokoli_web = {'keys': ["s sebou"],
                          'subnodes': [],
-                         'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Třeba Ti pomůže stránka našich skautů: " + LINK_SOKOLI_WEB}
+                         'action': {'type': Odezva.TEXT, 'data': "Třeba Ti pomůže stránka našich skautů: " + LINK_SOKOLI_WEB}
                          }
 
         uzel_help = {'keys': ["nápověd", "pomoc", "help", "příkazy", "/"],
                          'subnodes': [],
-                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.napoveda}
+                         'action': {'type': Odezva.METHOD, 'data':  self.napoveda}
                          }
 
         uzel_dik = {'keys': ["dík", "dik", "dekuj", "děkuj"],
                          'subnodes': [],
-                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.reaction_thumbs_up}
+                         'action': {'type': Odezva.METHOD, 'data':  self.reaction_thumbs_up}
                          }
 
         uzel_ahoj = {'keys': ["ahoj", "nazdar", "dobrou noc", "dobry den"],
                          'subnodes': [],
-                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.reaction_wave}
+                         'action': {'type': Odezva.METHOD, 'data':  self.reaction_wave}
                          }
 
         uzel_close = {'keys': ["spát!"],
                          'subnodes': [],
-                         'action': {'type': TYPE_RUTINNE_CLOSE, 'data': ""}
+                         'action': {'type': Odezva.CLOSE, 'data': ""}
                          }
 
         self.moznosti = {'keys': ["Pankráci"],
                          'subnodes': [uzel_close, uzel_dik, uzel_ahoj, uzel_sokoli_web, uzel_vyzvy, uzel_stezka_na_webu,
                                       uzel_novacek_na_webu, uzel_generuj_heslo, uzel_akce, uzel_help, uzel_spln],
-                         'action': {'type': TYPE_RUTINNE_METHOD, 'data':  self.nevim}
+                         'action': {'type': Odezva.METHOD, 'data':  self.nevim}
                          }
 
     ## TODO
@@ -100,16 +99,16 @@ class Pankrac:
         odpoved['type'] = ResponseType.MESSAGE
         odpoved['data'] = ""
 
-        if akce['type'] == TYPE_RUTINNE_METHOD:
+        if akce['type'] == Odezva.METHOD:
             odpoved['data'], odpoved['type'] = akce['data'](otazka)
 
-        elif akce['type'] == TYPE_RUTINNE_TEXT:
+        elif akce['type'] == Odezva.TEXT:
             odpoved['data'] = akce['data']
 
-        elif akce['type'] == TYPE_RUTINNE_TEXT_BY_USER:
+        elif akce['type'] == Odezva.TEXT_BY_USER:
             odpoved['data'] = self.reakce_dle_tabulky(message.author.name, akce['data'])
 
-        elif akce['type'] == TYPE_RUTINNE_CLOSE:
+        elif akce['type'] == Odezva.CLOSE:
             odpoved['type'] = ResponseType.CLOSE
 
         else:

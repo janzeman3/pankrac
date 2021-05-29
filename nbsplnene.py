@@ -1,4 +1,4 @@
-from konstanty import PREFIX, SUFFIX, NOT_FOUND, TYPE_RUTINNE_TEXT_BY_USER
+from konstanty import PREFIX, SUFFIX, NOT_FOUND, Odezva
 
 LINK_NOTION_SPLNENE_DB = "https://www.notion.so/janzeman3/3f6b1919e9bd49eaa46e2e21108ba0ce?v=62bb60897c594cf2ab1d8c30cab459d7"
 LINK_NOTION_SPLNENE_VSICHNI = "https://www.notion.so/janzeman3/Co-m-m-spln-n-f2bfced1bcc44d5588ad54568b11dca0"
@@ -18,7 +18,7 @@ def get_node_splnene():
 
     uzel_spln = {'keys': ["spln"],
                  'subnodes': [],
-                 'action': {'type': TYPE_RUTINNE_TEXT_BY_USER,
+                 'action': {'type': Odezva.TEXT_BY_USER,
                             'data': tabulka_odpovedi}
                  }
 
