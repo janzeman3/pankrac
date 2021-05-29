@@ -1,10 +1,7 @@
 import json
 
 from pankracutils import obsahuje
-
-TYPE_RUTINNE_CLOSE = -1
-TYPE_RUTINNE_TEXT = 1
-TYPE_RUTINNE_METHOD = 2
+from konstanty import TYPE_RUTINNE_CLOSE, TYPE_RUTINNE_METHOD, TYPE_RUTINNE_TEXT
 
 TYPE_RESPONSE_CLOSE = -1
 TYPE_RESPONSE_NOTHING = 0
@@ -15,7 +12,6 @@ TYPE_RESPONSE_REACTION = 3
 LINK_WEB_STEZKA = "https://stezka.skaut.cz/prohlizej-a-inspiruj-se/"
 LINK_WEB_NOVACEK = "https://stezka.skaut.cz/novacek/"
 LINK_NOTION_VYZVY = "https://www.notion.so/janzeman3/0995fe1d94a9403e99e667fc2ad15e30?v=3d42ab631c064ce0a16dda28bd06439d"
-LINK_NOTION_SPLNENE = "https://www.notion.so/janzeman3/3f6b1919e9bd49eaa46e2e21108ba0ce?v=62bb60897c594cf2ab1d8c30cab459d7"
 LINK_SOKOLI_AKCE = "https://ibis.skauting.cz/calendar/skauti/"
 LINK_SOKOLI_WEB = "https://ibis.skauting.cz/oddily/skauti-sokoli/"
 
@@ -29,10 +25,8 @@ class Pankrac:
     moznosti = {}
 
     def __init__(self):
-        uzel_spln = {'keys': ["spln"],
-                         'subnodes': [],
-                         'action': {'type': TYPE_RUTINNE_TEXT, 'data': "Asi by pomohl seznam splněných výzev a bodů stezky " + LINK_NOTION_SPLNENE}
-                         }
+        import nbsplnene
+        uzel_spln = nbsplnene.get_node_splnene()
 
         uzel_stezka_na_webu = {'keys': ["stezk"],
                          'subnodes': [uzel_spln],
