@@ -1,5 +1,3 @@
-import json
-
 from pankracutils import obsahuje
 from konstanty import TYPE_RUTINNE_CLOSE, TYPE_RUTINNE_METHOD, TYPE_RUTINNE_TEXT
 
