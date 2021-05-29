@@ -9,6 +9,7 @@ class Odezva(Enum):
     TEXT = 1
     METHOD = 2
     TEXT_BY_USER = 3
+    REACTION = 4
 
 class ResponseType(Enum):
     CLOSE = -1

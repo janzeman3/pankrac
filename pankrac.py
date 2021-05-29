@@ -43,6 +43,10 @@ class Pankrac:
         elif akce['type'] == Odezva.TEXT:
             odpoved['data'] = akce['data']
 
+        elif akce['type'] == Odezva.REACTION:
+            odpoved['type'] = ResponseType.REACTION
+            odpoved['data'] = akce['data']
+
         elif akce['type'] == Odezva.TEXT_BY_USER:
             odpoved['data'] = self.reakce_dle_tabulky(message.author.name, akce['data'])
 
@@ -96,14 +100,6 @@ class Pankrac:
 
         return hierarchie
 
-    def reaction_thumbs_up(self, message_text):
-        return Reaction.THUMB_UP, ResponseType.REACTION
-
-    def reaction_wave(self, message_text):
-        return Reaction.WAVE, ResponseType.REACTION
-
-    def reaction_cry(self, message_text):
-        return Reaction.CRY, ResponseType.REACTION
 
     def nevim(self, message_text):
         return 'slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat "Pankráci pomoc!"', ResponseType.MESSAGE
@@ -119,8 +115,15 @@ class Pankrac:
 
         return napoveda_text + hierarchie, ResponseType.MESSAGE
 
+    ### ===========================================
+    ### Metody, které nejsou nutné pro běh Pankráce
+    ### ===========================================
+
+    ## Generování hesla pomocí dicewaru
     def generuj_heslo(self, message_text):
         from dice_heslo import get_password
         heslo = get_password()
         odpoved = "vygeneroval jsem Ti heslo :muscle: \n" + heslo + "\nmezery do hesla nezadávej :wink:"
         return odpoved, ResponseType.MESSAGE
+
+    ## TODO sem přijdou šifry a dešifry

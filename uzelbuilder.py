@@ -1,5 +1,5 @@
 import uzelbuildersplnene
-from konstanty import Odezva
+from konstanty import Odezva, Reaction
 
 LINK_WEB_STEZKA = "https://stezka.skaut.cz/prohlizej-a-inspiruj-se/"
 LINK_WEB_NOVACEK = "https://stezka.skaut.cz/novacek/"
@@ -49,12 +49,12 @@ def hlavni_uzel(Pankrac):
 
     uzel_dik = {'keys': ["dík", "dik", "dekuj", "děkuj"],
                 'subnodes': [],
-                'action': {'type': Odezva.METHOD, 'data': Pankrac.reaction_thumbs_up}
+                'action': {'type': Odezva.REACTION, 'data': Reaction.THUMB_UP}
                 }
 
     uzel_ahoj = {'keys': ["ahoj", "nazdar", "dobrou noc", "dobry den"],
                  'subnodes': [],
-                 'action': {'type': Odezva.METHOD, 'data': Pankrac.reaction_wave}
+                 'action': {'type': Odezva.REACTION, 'data': Reaction.WAVE}
                  }
 
     uzel_close = {'keys': ["spát!"],
