@@ -15,4 +15,9 @@ class ResponseType(Enum):
     MESSAGE = 1
     ANSWER = 2
     REACTION = 3
-    MESSAGE_RESPONDENT_BASED = 4
+
+class Reaction(Enum):
+    WAVE = "👋"
+    THUMB_UP = "👍"
+    CRY = "😭"
+    EYES = "👀"

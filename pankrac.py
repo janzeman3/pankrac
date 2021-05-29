@@ -1,17 +1,12 @@
 from pankracutils import obsahuje
 from konstanty import TYPE_RUTINNE_CLOSE, TYPE_RUTINNE_METHOD, TYPE_RUTINNE_TEXT, TYPE_RUTINNE_TEXT_BY_USER
-from konstanty import ResponseType
+from konstanty import ResponseType, Reaction
 
 LINK_WEB_STEZKA = "https://stezka.skaut.cz/prohlizej-a-inspiruj-se/"
 LINK_WEB_NOVACEK = "https://stezka.skaut.cz/novacek/"
 LINK_NOTION_VYZVY = "https://www.notion.so/janzeman3/0995fe1d94a9403e99e667fc2ad15e30?v=3d42ab631c064ce0a16dda28bd06439d"
 LINK_SOKOLI_AKCE = "https://ibis.skauting.cz/calendar/skauti/"
 LINK_SOKOLI_WEB = "https://ibis.skauting.cz/oddily/skauti-sokoli/"
-
-REACTION_WAVE = "👋"
-REACTION_THUMB_UP = "👍"
-REACTION_CRY = "😭"
-REACTION_EYES = "👀"
 
 ## Odpovídací logika chatbota
 class Pankrac:
@@ -167,13 +162,13 @@ class Pankrac:
         return hierarchie
 
     def reaction_thumbs_up(self, message_text):
-        return REACTION_THUMB_UP, ResponseType.REACTION
+        return Reaction.THUMB_UP, ResponseType.REACTION
 
     def reaction_wave(self, message_text):
-        return REACTION_WAVE, ResponseType.REACTION
+        return Reaction.WAVE, ResponseType.REACTION
 
     def reaction_cry(self, message_text):
-        return REACTION_CRY, ResponseType.REACTION
+        return Reaction.CRY, ResponseType.REACTION
 
     def nevim(self, message_text):
         return 'slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat "Pankráci pomoc!"', ResponseType.MESSAGE

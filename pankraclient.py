@@ -2,7 +2,7 @@ import discord
 import pankrac
 from pankrac import Pankrac
 from pankracutils import now
-from konstanty import ResponseType
+from konstanty import ResponseType, Reaction
 
 WRAPPER = '\n===================='
 
@@ -70,7 +70,7 @@ class PankracClient(discord.Client):
         print('Pankrác osloven!')
         # pokud Pankrác pozná, že je to pro něj, tak dá očko
         print('Pankrác dává očíčka.')
-        await message.add_reaction(pankrac.REACTION_EYES)
+        await message.add_reaction(Reaction.EYES)
 
         # zavolá se zpracování zpráv a odešle se odezva
         odpoved = self.nasPankrac.zpracuj_zpravu(message)
