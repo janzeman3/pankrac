@@ -41,7 +41,7 @@ class PankracClient(discord.Client):
             return
 
         # pokud Pankrác pozná, že je to pro něj, tak dá očko
-        await message.add_reaction("👀")
+        await message.add_reaction(pankrac.REACTION_EYES)
 
         print(now() + '\nPankrác osloven')
         print("{0} (ID {1}): {2}".format(message.author.name, message.author.id, message.content))

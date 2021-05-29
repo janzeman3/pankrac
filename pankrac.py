@@ -22,6 +22,7 @@ LINK_SOKOLI_WEB = "https://ibis.skauting.cz/oddily/skauti-sokoli/"
 REACTION_WAVE = "👋"
 REACTION_THUMB_UP = "👍"
 REACTION_CRY = "😭"
+REACTION_EYES = "👀"
 
 ## Odpovídací logika chatbota
 class Pankrac:
