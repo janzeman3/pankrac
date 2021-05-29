@@ -84,8 +84,6 @@ class Pankrac:
         # nakonec provedu akci z finálního uzlu
         return self.vysledek_akce(uzel['action'], message)
 
-    def zpracuj_reakci(self, reakce):
-        return {'type': ResponseType.NOTHING}
 
     def generuj_hierarchii(self, uzel, odsazeni):
         hierarchie = "".ljust(odsazeni*4, " ") + "- "
