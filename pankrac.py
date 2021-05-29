@@ -1,12 +1,6 @@
 from pankracutils import obsahuje
 from konstanty import TYPE_RUTINNE_CLOSE, TYPE_RUTINNE_METHOD, TYPE_RUTINNE_TEXT, TYPE_RUTINNE_TEXT_BY_USER
-
-TYPE_RESPONSE_CLOSE = -1
-TYPE_RESPONSE_NOTHING = 0
-TYPE_RESPONSE_MESSAGE = 1
-TYPE_RESPONSE_ANSWER = 2
-TYPE_RESPONSE_REACTION = 3
-TYPE_RESPONSE_MESSAGE_RESPONDENT_BASED = 4
+from konstanty import ResponseType
 
 LINK_WEB_STEZKA = "https://stezka.skaut.cz/prohlizej-a-inspiruj-se/"
 LINK_WEB_NOVACEK = "https://stezka.skaut.cz/novacek/"
@@ -108,7 +102,7 @@ class Pankrac:
     def vysledek_akce(self, akce, message):
         otazka = message.content
         odpoved = {}
-        odpoved['type'] = TYPE_RESPONSE_MESSAGE
+        odpoved['type'] = ResponseType.MESSAGE
         odpoved['data'] = ""
 
         if akce['type'] == TYPE_RUTINNE_METHOD:
@@ -121,7 +115,7 @@ class Pankrac:
             odpoved['data'] = self.reakce_dle_tabulky(message.author.name, akce['data'])
 
         elif akce['type'] == TYPE_RUTINNE_CLOSE:
-            odpoved['type'] = TYPE_RESPONSE_CLOSE
+            odpoved['type'] = ResponseType.CLOSE
 
         else:
             odpoved['data'] = "Chyba dat kontaktuj programátory..."
@@ -159,7 +153,7 @@ class Pankrac:
         return self.vysledek_akce(uzel['action'], message)
 
     def zpracuj_reakci(self, reakce):
-        return {'type': TYPE_RESPONSE_NOTHING}
+        return {'type': ResponseType.NOTHING}
 
     def generuj_hierarchii(self, uzel, odsazeni):
         hierarchie = "".ljust(odsazeni*4, " ") + "- "
@@ -173,16 +167,16 @@ class Pankrac:
         return hierarchie
 
     def reaction_thumbs_up(self, message_text):
-        return REACTION_THUMB_UP, TYPE_RESPONSE_REACTION
+        return REACTION_THUMB_UP, ResponseType.REACTION
 
     def reaction_wave(self, message_text):
-        return REACTION_WAVE, TYPE_RESPONSE_REACTION
+        return REACTION_WAVE, ResponseType.REACTION
 
     def reaction_cry(self, message_text):
-        return REACTION_CRY, TYPE_RESPONSE_REACTION
+        return REACTION_CRY, ResponseType.REACTION
 
     def nevim(self, message_text):
-        return 'slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat "Pankráci pomoc!"', TYPE_RESPONSE_MESSAGE
+        return 'slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat "Pankráci pomoc!"', ResponseType.MESSAGE
 
     def napoveda(self, message_text):
         napoveda_text = "Nápověda: \n" \
@@ -193,10 +187,10 @@ class Pankrac:
         hierarchie = "Hierarchie klíčových slov\n"
         hierarchie += self.generuj_hierarchii(self.moznosti, 1)
 
-        return napoveda_text + hierarchie, TYPE_RESPONSE_MESSAGE
+        return napoveda_text + hierarchie, ResponseType.MESSAGE
 
     def generuj_heslo(self, message_text):
         from dice_heslo import get_password
         heslo = get_password()
         odpoved = "vygeneroval jsem Ti heslo :muscle: \n" + heslo + "\nmezery do hesla nezadávej :wink:"
-        return odpoved, TYPE_RESPONSE_MESSAGE
+        return odpoved, ResponseType.MESSAGE

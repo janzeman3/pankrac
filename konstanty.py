@@ -6,3 +6,13 @@ TYPE_RUTINNE_CLOSE = -1
 TYPE_RUTINNE_TEXT = 1
 TYPE_RUTINNE_METHOD = 2
 TYPE_RUTINNE_TEXT_BY_USER = 3
+
+from enum import Enum
+
+class ResponseType(Enum):
+    CLOSE = -1
+    NOTHING = 0
+    MESSAGE = 1
+    ANSWER = 2
+    REACTION = 3
+    MESSAGE_RESPONDENT_BASED = 4

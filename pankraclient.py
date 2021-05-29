@@ -2,6 +2,7 @@ import discord
 import pankrac
 from pankrac import Pankrac
 from pankracutils import now
+from konstanty import ResponseType
 
 WRAPPER = '\n===================='
 
@@ -22,13 +23,13 @@ class PankracClient(discord.Client):
 
     ## podle typu odpovědi buď odepíše, nebo reaguje
     async def posli_odezvu(self, odezva, message):
-        if odezva['type'] == pankrac.TYPE_RESPONSE_MESSAGE:
+        if odezva['type'] == ResponseType.MESSAGE:
             print("Pankrác odpovídá: " + odezva['data'])
             await message.channel.send("<@" + str(message.author.id) + ">, " + odezva['data'])
-        elif odezva['type'] == pankrac.TYPE_RESPONSE_REACTION:
+        elif odezva['type'] == ResponseType.REACTION:
             print("Pankrác dal reakci: " + odezva['data'])
             await message.add_reaction(odezva['data'])
-        elif odezva['type'] == pankrac.TYPE_RESPONSE_CLOSE:
+        elif odezva['type'] == ResponseType.CLOSE:
             if (message.author.name == "janzeman3"):
                 await message.add_reaction(pankrac.REACTION_CRY)
                 await message.channel.send("Kluci, loučím se, pro dnešek musím :wave:")
