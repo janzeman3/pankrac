@@ -39,7 +39,7 @@ class PankracClient(discord.Client):
 
         # vypnutí Pankráce, když mu jeho autor napíše, že má jít spát
         if (message.author.name == "janzeman3") and message.content == "Pankráci, spát!":
-            await message.add_reaction("😭")
+            await message.add_reaction(pankrac.REACTION_CRY)
             await message.channel.send("Kluci, loučím se, pro dnešek musím :wave:")
             await self.close()
             print("Končím...")

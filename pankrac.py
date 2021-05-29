@@ -17,6 +17,10 @@ LINK_NOTION_SPLNENE = "https://www.notion.so/janzeman3/3f6b1919e9bd49eaa46e2e211
 LINK_SOKOLI_AKCE = "https://ibis.skauting.cz/calendar/skauti/"
 LINK_SOKOLI_WEB = "https://ibis.skauting.cz/oddily/skauti-sokoli/"
 
+REACTION_WAVE = "👋"
+REACTION_THUMB_UP = "👍"
+REACTION_CRY = "😭"
+
 ## Odpovídací logika chatbota
 class Pankrac:
     moznosti = {}
@@ -138,10 +142,13 @@ class Pankrac:
         return hierarchie
 
     def reaction_thumbs_up(self, message_text):
-        return "👍", TYPE_RESPONSE_REACTION
+        return REACTION_THUMB_UP, TYPE_RESPONSE_REACTION
 
     def reaction_wave(self, message_text):
-        return "👋", TYPE_RESPONSE_REACTION
+        return REACTION_WAVE, TYPE_RESPONSE_REACTION
+
+    def reaction_cry(self, message_text):
+        return REACTION_CRY, TYPE_RESPONSE_REACTION
 
     def nevim(self, message_text):
         return 'slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat "Pankráci pomoc!"', TYPE_RESPONSE_MESSAGE
