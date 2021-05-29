@@ -3,6 +3,8 @@ import pankrac
 from pankrac import Pankrac
 from pankracutils import now
 
+WRAPPER = '\n===================='
+
 ## Třída, která řeší spojení s discordem a výpisy do konzole na straně serveru
 #  Jedná se o potomka discord.Client, takže overridujme události a posíláme je do Pankráce
 class PankracClient(discord.Client):
@@ -21,10 +23,10 @@ class PankracClient(discord.Client):
     ## podle typu odpovědi buď odepíše, nebo reaguje
     async def posli_odpoved(self, odpoved, message):
         if odpoved['type'] == pankrac.TYPE_RESPONSE_MESSAGE:
-            print("Pankrác odpoví: " + odpoved['data'] + "\n------\n")
+            print("Pankrác odpovídá: " + odpoved['data'])
             await message.channel.send("<@" + str(message.author.id) + ">, " + odpoved['data'])
         elif odpoved['type'] == pankrac.TYPE_RESPONSE_REACTION:
-            print("Pankrác dal reakci: " + odpoved['data'] + "\n------\n")
+            print("Pankrác dal reakci: " + odpoved['data'])
             await message.add_reaction(odpoved['data'])
         elif odpoved['type'] == pankrac.TYPE_RESPONSE_CLOSE:
             if (message.author.name == "janzeman3"):
@@ -35,27 +37,21 @@ class PankracClient(discord.Client):
 
     ## Zpracování zprávy do diskusního kanálu
     async def on_message(self, message):
+        print(WRAPPER)
+        print('Čtu zprávu...')
+        print(now() + " - {0} (ID {1}): {2}".format(message.author.name, message.author.id, message.content))
+
         # pankrác nereaguje na sebe a reaguje jen, když je osloven
         osloveni = ['<@!843012795440168962>', 'Pankráci', 'pankráci', 'Pankraci', 'pankraci']
         if (message.author.id == self.user.id) or not any([True for x in osloveni if x in message.content]):
             return
 
+        print('Pankrác osloven!')
+
         # pokud Pankrác pozná, že je to pro něj, tak dá očko
+        print('Pankrác dává očíčka.')
         await message.add_reaction(pankrac.REACTION_EYES)
 
-        print(now() + '\nPankrác osloven')
-        print("{0} (ID {1}): {2}".format(message.author.name, message.author.id, message.content))
 
         odpoved = self.nasPankrac.zpracuj_zpravu(message)
         await self.posli_odpoved(odpoved, message)
-
-
-    ## Zpracování reakcí
-    async def on_reaction_add(self, reaction, user):
-        # pouze monitoring
-        print(now() + '\nNová reakce')
-        print("Zpráva:   " + reaction.message.content)
-        print("Reakce:   " + str(reaction))
-        print("Uživatel: " + user.name)
-        odpoved = self.nasPankrac.zpracuj_reakci(reaction)
-        await self.posli_odpoved(odpoved, reaction.message)
