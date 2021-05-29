@@ -21,37 +21,38 @@ class PankracClient(discord.Client):
         print('------')
 
     ## podle typu odpovědi buď odepíše, nebo reaguje
-    async def posli_odpoved(self, odpoved, message):
-        if odpoved['type'] == pankrac.TYPE_RESPONSE_MESSAGE:
-            print("Pankrác odpovídá: " + odpoved['data'])
-            await message.channel.send("<@" + str(message.author.id) + ">, " + odpoved['data'])
-        elif odpoved['type'] == pankrac.TYPE_RESPONSE_REACTION:
-            print("Pankrác dal reakci: " + odpoved['data'])
-            await message.add_reaction(odpoved['data'])
-        elif odpoved['type'] == pankrac.TYPE_RESPONSE_CLOSE:
+    async def posli_odezvu(self, odezva, message):
+        if odezva['type'] == pankrac.TYPE_RESPONSE_MESSAGE:
+            print("Pankrác odpovídá: " + odezva['data'])
+            await message.channel.send("<@" + str(message.author.id) + ">, " + odezva['data'])
+        elif odezva['type'] == pankrac.TYPE_RESPONSE_REACTION:
+            print("Pankrác dal reakci: " + odezva['data'])
+            await message.add_reaction(odezva['data'])
+        elif odezva['type'] == pankrac.TYPE_RESPONSE_CLOSE:
             if (message.author.name == "janzeman3"):
                 await message.add_reaction(pankrac.REACTION_CRY)
                 await message.channel.send("Kluci, loučím se, pro dnešek musím :wave:")
                 await self.close()
                 print("Končím...")
 
-    ## Zpracování zprávy do diskusního kanálu
+    ## Zpracování zpráv z diskusního kanálu
     async def on_message(self, message):
+        # výpist příchozí zprávy
         print(WRAPPER)
         print('Čtu zprávu...')
         print(now() + " - {0} (ID {1}): {2}".format(message.author.name, message.author.id, message.content))
 
-        # pankrác nereaguje na sebe a reaguje jen, když je osloven
+        # test, jestli je Pankác osloven (skončíme, pokud osleven není)
         osloveni = ['<@!843012795440168962>', 'Pankráci', 'pankráci', 'Pankraci', 'pankraci']
         if (message.author.id == self.user.id) or not any([True for x in osloveni if x in message.content]):
             return
 
+        #Pankrác byl osloven
         print('Pankrác osloven!')
-
         # pokud Pankrác pozná, že je to pro něj, tak dá očko
         print('Pankrác dává očíčka.')
         await message.add_reaction(pankrac.REACTION_EYES)
 
-
+        # zavolá se zpracování zpráv a odešle se odezva
         odpoved = self.nasPankrac.zpracuj_zpravu(message)
-        await self.posli_odpoved(odpoved, message)
+        await self.posli_odezvu(odpoved, message)
