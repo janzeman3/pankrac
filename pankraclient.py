@@ -13,22 +13,40 @@ class PankracClient(discord.Client):
         discord.Client.__init__(self)
         self.nasPankrac = Pankrac()
 
-    ## Když Pankrác nastaruje a připojí se k discordu
+    ## Vypíše info, když Pankrác nastaruje a připojí se k discordu
     async def on_ready(self):
         print(now())
         print('Startuji Pankráce...')
         print("Username:" + self.user.name)
         print("ID:      " + str(self.user.id))
-        print('------')
 
-    ## podle typu odpovědi buď odepíše, nebo reaguje
+    ## podle typu odezvy buď odepíše, nebo reaguje
+    # Odezva je očekávána ve formátu:
+    #   {'type': ResponseType
+    #    'data': struktura podle Responsetype}
+    #
+    #  data pro ResponseType.MESSAGE a pro ResponseType.ANSWER:
+    #       'data: '"odpověď" - řetezec s odpovědí
+    #       pošle zprávu, nebo dá odpověď podle typu odezvy
+    #  ResponseType.REACTION:
+    #       'data: "👍" - řetězec se smajlíkem viz třída Reaction v konstanty.py
+    #       drá zadanou reakci
+    #  ResponseType.CLOSE:
+    #       'data: [] - prázdná data
+    #       ukončí Pankráce, pokud příkaz poslal autor
     async def posli_odezvu(self, odezva, message):
         if odezva['type'] == ResponseType.MESSAGE:
             print("Pankrác odpovídá: " + odezva['data'])
             await message.channel.send("<@" + str(message.author.id) + ">, " + odezva['data'])
+
+        elif odezva['type'] == ResponseType.ANSWER:
+            print("Pankrác odpovídá: " + odezva['data'])
+            await message.reply("<@" + str(message.author.id) + ">, " + odezva['data'])
+
         elif odezva['type'] == ResponseType.REACTION:
             print("Pankrác dal reakci: " + odezva['data'])
             await message.add_reaction(odezva['data'])
+
         elif odezva['type'] == ResponseType.CLOSE:
             if (message.author.name == "janzeman3"):
                 await message.add_reaction(pankrac.REACTION_CRY)
