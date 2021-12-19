@@ -1,16 +1,55 @@
 from pankracutils import obsahuje
-from konstanty import ResponseType, Reaction, Odezva
+from konstanty import ResponseType, Odezva
 import uzelbuilder
 
 ## Odpovídací logika chatbota
 class Pankrac:
+    ## rozhodovací strom
     moznosti = {}
 
+    ## konstruktor naplní rozhodovací strom pomocí uzelbuilderu
     def __init__(self):
         self.moznosti = uzelbuilder.hlavni_uzel(self)
 
+    ## Hlavní metoda - přijme zprávu a vrátí odezvu
+    def zpracuj_zpravu(self, message):
+        # ze zprávy vytáhne text
+        otazka = message.content
+
+        uzel = self.najdi_uzel(otazka)
+
+        # nakonec provedu akci z finálního uzlu
+        return self.vysledek_akce(uzel['action'], message)
+
+    ## Prochází strom ožností a hledá konečný uzel
+    def najdi_uzel(self, otazka):
+
+        nejde_jit_dal = False   # ridici proměnná, která říká, jeslti jsme na konci
+        uzel = self.moznosti    # poslední uzel, kde jsme skončili
+
+        while not nejde_jit_dal:
+            # do noveho uzlu dam stavajici
+            novy_uzel = uzel
+
+            #projdu všechny pod-uzly
+            for poduzel in uzel['subnodes']:
+                if obsahuje(poduzel['keys'], otazka):
+                    # pokud najdu pokračování, dám kandidáta na nový uzel
+                    # !!! v případě shody to vybere poslední shodu
+                    novy_uzel = poduzel
+
+            if novy_uzel == uzel:
+                # pokud jsem se neposunul, nejde jít dál
+                nejde_jit_dal = True
+            else:
+                # jinak upadutuju uzel a frčím znovu
+                uzel = novy_uzel
+
+        return uzel
+
     ## TODO
-    def reakce_dle_tabulky(self, uzivatel, tabulka_odpovedi):
+    @staticmethod
+    def reakce_dle_tabulky(uzivatel, tabulka_odpovedi):
         odpoved = ""
 
         klice = tabulka_odpovedi.keys()
@@ -33,12 +72,10 @@ class Pankrac:
     ## obdrží akci a vygeneruje její výsledek na základě dané otázky
     def vysledek_akce(self, akce, message):
         otazka = message.content
-        odpoved = {}
-        odpoved['type'] = ResponseType.MESSAGE
-        odpoved['data'] = ""
+        odpoved = {'type': ResponseType.MESSAGE, 'data': ""}
 
         if akce['type'] == Odezva.METHOD:
-            odpoved['data'], odpoved['type'] = akce['data'](otazka)
+            odpoved['data'], odpoved['type'] = akce['data'](message_text = otazka)
 
         elif akce['type'] == Odezva.TEXT:
             odpoved['data'] = akce['data']
@@ -58,36 +95,6 @@ class Pankrac:
 
         return odpoved
 
-    ## zpracuje odezvu podle obsahu proměnné self.moznosti
-    def zpracuj_zpravu(self, message):
-        otazka = message.content
-
-        # ridici proměnná, která říká, jeslti jsme na konci
-        nejde_jit_dal = False
-        # poslední uzel, kde jsme skončili
-        uzel = self.moznosti
-
-        while not nejde_jit_dal:
-            # do noveho uzlu dam stavajici
-            novy_uzel = uzel
-
-            #projdu všechny pod-uzly
-            for poduzel in uzel['subnodes']:
-                if obsahuje(poduzel['keys'], otazka):
-                    # pokud najdu pokračování, dám kandidáta na nový uzel
-                    # !!! v případě shody to vybere poslední shodu
-                    novy_uzel = poduzel
-
-            if novy_uzel == uzel:
-                # pokud jsem se neposunul, nejde jít dál
-                nejde_jit_dal = True
-            else:
-                # jinak upadutuju uzel a frčím znovu
-                uzel = novy_uzel
-
-        # nakonec provedu akci z finálního uzlu
-        return self.vysledek_akce(uzel['action'], message)
-
 
     def generuj_hierarchii(self, uzel, odsazeni):
         hierarchie = "".ljust(odsazeni*4, " ") + "- "
@@ -100,8 +107,8 @@ class Pankrac:
 
         return hierarchie
 
-
-    def nevim(self, message_text):
+    @staticmethod
+    def nevim(message_text):
         return 'slyším Tě, ale ale nevím, co po mě chceš. Zkus napsat "Pankráci pomoc!"', ResponseType.MESSAGE
 
     def napoveda(self, message_text):
@@ -120,7 +127,8 @@ class Pankrac:
     ### ===========================================
 
     ## Generování hesla pomocí dicewaru
-    def generuj_heslo(self, message_text):
+    @staticmethod
+    def generuj_heslo(message_text):
         from dice_heslo import get_password
         heslo = get_password()
         odpoved = "vygeneroval jsem Ti heslo :muscle: \n" + heslo + "\nmezery do hesla nezadávej :wink:"
